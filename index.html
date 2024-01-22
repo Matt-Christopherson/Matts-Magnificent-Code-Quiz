@@ -8,16 +8,17 @@
 </head>
 <body>
     <div class="wrapper">
-        <header>
-            <h1>Coding Quiz Challenge</h1>
-        </header>
         <div class="card">
-            <div id="timer">00:00</div>
-            <div class="card-header">
-                <h2>Click start to begin!</h2>
+            <h3 id="timer"></h3>
+            <div id="card-header">
+                <span>Coding Quiz Challenge</span>
+            </div>
+            <div id="card-body">
+                <p>Try to answer the following code-related questions within the time limit. Keep in mind that incorrect answers will penalize your score/time by ten seconds!</p>
             </div>
             <div class="button">
-                <button id="start" class="btn">START</button>    
+                <button id="start" class="btn" onclick="letsBegin()">Start Quiz</button>    
+            <footer><span id="card-footer"></span></footer>    
         </div>
     </div>
     <script src="script.js"></script>
