@@ -57,11 +57,13 @@ function startTimer() {
     console.log("timer set"); // Console logs "timer set". Unnecessary for the functioning of the application, only included for debugging purposes.
 }
 
+// This function runs when the user clicks "start quiz" and when they answer a question. When it runs, it shows the next question and set of answers to the user.
 function displayQuestion() {
-    questionEl.textContent = questions[currentQuestion].question;
+    questionEl.textContent = questions[currentQuestion].question;//Changes the text content of the card header into the next question in the array.
+    answersEl.textContent = "";//Clears the text content of the card body.
 
-    answersEl.textContent = "";
-    for (let i = 0; i < questions [currentQuestion].answers.length; i++) {
+    //This for loop runs through the answers in the array and creates button elements that can be clicked to run a function that checks to see if the button clicked was the correct answer.
+    for (let i = 0; i < questions [currentQuestion].answers.length; i++) { 
         const answerButton = document.createElement("button");
         answerButton.textContent = questions[currentQuestion].answers[i];
         answerButton.onclick = function () {
@@ -70,74 +72,81 @@ function displayQuestion() {
         answersEl.appendChild(answerButton);
     };
 }
-
+//This is the aforementioned function that the for loop on line 66 uses to check if the user's chosen button was correct. 
 function checkAnswer(selectedAnswer) {
-    const correctAnswer = questions[currentQuestion].correctAnswer;
-    if (selectedAnswer === correctAnswer) {
-        footerEl.textContent = "Correct!";
+    const correctAnswer = questions[currentQuestion].correctAnswer; //Sets the correct answer.
+    if (selectedAnswer === correctAnswer) { //If the clicked answer is equal to the correct answer-
+        footerEl.textContent = "Correct!"; //-then the footer on the next question will say "correct!". But if not-
     } else {
-        timeLimit -= 10;
-        footerEl.textContent = "Incorrect! -10 Seconds!"
+        timeLimit -= 10; //-then the time limit is reduced by 10 seconds and-
+        footerEl.textContent = "Incorrect! -10 Seconds!" //-the footer on the next question will inform the user, "incorrect! -10 seconds!".
     }
 
-    currentQuestion++;
-    if (currentQuestion < questions.length) {
-        displayQuestion ();
+    currentQuestion++; //This function also handles increasing the array number to 1, letting the browser know that we are on to the next question.
+    if (currentQuestion < questions.length) { //If the current question is less than the length of the questions array-
+        displayQuestion ();//-then it will run the displayQuestion function. But if not-
     } else {
-        endGame();
+        endGame();//it runs the endGame function. Which, true to its name, ends the game. 
     }
-    console.log("Current Score: " + timeLimit);
+    console.log("Current Score: " + timeLimit);//Console logs the current score for debugging purposes.
   }
 
+ //This function ends the game, like I said before. 
 function endGame() {
-    clearInterval(timerInterval);
-    footerEl.textContent = "";
-    questionEl.textContent = "Game Over!";
-    answersEl.textContent = "Your final score is: " + timeLimit;
+    clearInterval(timerInterval); //Stops the timer.
+    footerEl.textContent = ""; //Clears the footer text content.
+    questionEl.textContent = "Game Over!"; //Sets the text content in the card header to "Game Over!"
+    answersEl.textContent = "Your final score is: " + timeLimit; //Sets the text content in the card body to a message telling the user their final score.
 
-    const scoreboardForm = document.createElement("form");
-    scoreboardForm.innerHTML = "<label for='name'>Enter your name to save your score: </label>" + "<input type='text' id='name' name='name'>" + "<input type='submit' value=submit>";
-    answersEl.appendChild(scoreboardForm);
+    //These next three lines create a form for the user to enter their name.
+    const scoreboardForm = document.createElement("form"); //Creates an HTML form element and assigns it to a variable called scoreboardForm.
+    scoreboardForm.innerHTML = "<label for='name'>Enter your name to save your score: </label>" + "<input type='text' id='name' name='name'>" + "<input type='submit' value=submit>"; //Edits the form element's HTML to add a label, an input id, and a submit button.
+    answersEl.appendChild(scoreboardForm); //Adds the form to the bottom of the card body.
 
-    scoreboardForm.addEventListener("submit", function(event) {
-        event.preventDefault();
-        const playerName = document.getElementById("name").value;
-        saveScore (playerName, timeLimit);
+    scoreboardForm.addEventListener("submit", function(event) { //Waits for the user to click the submit button on their form.
+        event.preventDefault(); //Prevents the page from refreshing.
+        const playerName = document.getElementById("name").value; //Creates a variable called playerName equal to the name entered in the form.
+        saveScore (playerName, timeLimit); //Changes the parameters for the saveScore function, which will be found and explained on line 142.
 
-    displayLeaderboardButton();
+    displayLeaderboardButton();//Runs the displayLeaderBoard function when the form's submit button is clicked.
     });
   }
 
+// This function displays the leaderboard.
 function displayLeaderboardButton() {
-    const leaderboardButton = document.createElement("button");
-    leaderboardButton.textContent = "View Leaderboard";
-    answersEl.appendChild(leaderboardButton);
-
+    const leaderboardButton = document.createElement("button"); //Creates an HTML button element and assigns it to a variable called leaderboardButton.
+    leaderboardButton.textContent = "View Leaderboard";//Changes the text content of the button so it reads, "View Leaderboard".
+    answersEl.appendChild(leaderboardButton);//Adds the button to the bototm of the card body.
+    //Waits for the user to click the leaderboard button and then runs the displayLeaderboard function.
     leaderboardButton.addEventListener("click", function() {
         displayLeaderboard();
     })
 }  
 
+// Shows the user the leaderboard of scores from previous users using the same local data.
 function displayLeaderboard() {
-    timeEl.textContent="";
-    retrieveLeaderboard();
+    timeEl.textContent=""; //Hides the timer.
+    retrieveLeaderboard(); //runs the retrieveLeaderboard function so it can parse the local data.
     let leaderboardHTML = "<h1>Leaderboard</h1>";
+    //Goes through each leaderboard entry saved in the leaderboard array and makes it into a list.
     for (let i=0; i < leaderboard.length; i++) {
         const entry = leaderboard[i];
         leaderboardHTML += "<p>" + entry.name + ": " + entry.score + "</p>";
     }
-    answersEl.innerHTML = leaderboardHTML;
-    questionEl.textContent = "";
-    footerEl.textContent = "Refresh the page to try again!"
+    answersEl.innerHTML = leaderboardHTML; //Changes the card body to the list of leaderboard entries.
+    questionEl.textContent = ""; //Clears the card header.
+    footerEl.textContent = "Refresh the page to try again!" //Lets the user know how they can retry the quiz.
 }
 
+//Uses the parameters set by the function on line 106 to save the score and name entry given by the user to the local data.
 function saveScore(playerName, score) {
     retrieveLeaderboard();
     leaderboard.push({name: playerName, score: score});
     leaderboard.sort((a, b) => b.score - a.score);
-    localStorage.setItem("leaderboard", JSON.stringify(leaderboard));
+    localStorage.setItem("leaderboard", JSON.stringify(leaderboard)); //Stringifies the item sent to the local storage.
   }
 
+//Retrieves the data saved in the local data, parses it, and turns it into an array. 
 function retrieveLeaderboard() {
     leaderboard = JSON.parse(localStorage.getItem("leaderboard")) || [];
 }
